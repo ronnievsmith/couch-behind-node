@@ -17,16 +17,17 @@ Install and then initialize Git on the host computer by issuing `git init`. Clon
 
 ### 3. Create `.env` file in root folder and in `nodejs` folder.
 
-`.env`
-COUCHDB_USER="admin"
-COUCHDB_PASSWORD="admin"
+```
+.env
+	COUCHDB_USER="admin"
+	COUCHDB_PASSWORD="admin"
 
-`/nodejs/.env`
-COUCHDB_USER="admin"
-COUCHDB_PASSWORD="admin"
-COUCHBD_PORT="5984"
-NODEJS_PORT="8080"
-SENDGRID_API_KEY="MY.SENGGRID.KEY"
-
+/nodejs/.env
+	COUCHDB_USER="admin"
+	COUCHDB_PASSWORD="admin"
+	COUCHBD_PORT="5984"
+	NODEJS_PORT="8080"
+	SENDGRID_API_KEY="MY.SENGGRID.KEY"
+```
 ### 3. Run the System
 Open up a terminal at the directory containing the `compose.yaml` file and issue the command `docker compose up` to build and run the system of servers. For more information see https://docs.docker.com/engine/reference/commandline/compose_up/. The couchdb adminitrator graphical user interface is available at `http://localhost:5984` and the homepage is available at `http://localhost`.
