@@ -11,7 +11,7 @@ JSON Web Tokens minted from email link authentication delivers client side sessi
 
 Nginx is the front end reverse proxy cache engine. Nodejs' http module is minimally configured as a web server and crypto library issues and verifies JWT's. CouchDB is the document database.
 
-![image](./nodejs/public/media/topology.png)
+![image](./nodejs/public/media/app.jpg)
 
 ## Getting Started
 
@@ -35,7 +35,12 @@ Install and then initialize Git on the host computer by issuing `git init`. Clon
 	NODEJS_PORT="8080"
 	SENDGRID_API_KEY="MY.SENGGRID.KEY"
 ```
+
+![image](./nodejs/public/media/fetch.jpg)
+
 ### 3. Run the System
 Open up a terminal at the directory containing the `compose.yaml` file and issue the command `docker compose up` to build and run the system of servers. For more information see https://docs.docker.com/engine/reference/commandline/compose_up/. The couchdb adminitrator graphical user interface is available at `http://localhost:5984` and the homepage is available at `http://localhost`.
 
 Further instructions available on the homepage at `http://localhost`.
+
+![image](./nodejs/public/media/topology.png)
