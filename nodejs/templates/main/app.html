@@ -1,0 +1,20 @@
+<main>
+  <h1>My Web Application</h1>
+  <p>
+  	This page displays files that have been uploaded to CouchDB by individual users. Note that the term <i>bucket</i> is used here but in CouchDB terminology files are stored as <i>attachments</i> to documents.
+	</p>
+	<h2>User Management</h2>
+	<p>
+		The process of email link authentication begins with collecting a users email address and POST'ing it to the Node.js server which then generates a random ID and stores it along with the users information in CouchDB. Once the user recieves the email and clicks the link a GET request is sent to Node.js that includes the random ID which if found in CouchDB results in a JSON Web Token being minted and returned to the client in an HTTP cookie. From then on the users ID is sent to the server in each HTTP call.
+	</p>
+  <h2>Server Assembled in <span id="time"></span> Milliseconds</h2>
+	<p>
+		All HTML files are assembled by the Node.js server. The homepage is assembled and stored as <code>index.html</code> prior to starting the HTTP server. This <a href="/app">/app</a> page is assembled from disparate files on the fly by the server in response to HTTP request to the <code>/app</code> path. In other words there is no <code>app.html</code> file stored on the server. Instead, there is a <code>header.html</code>, <code>main.html</code>, and <code>footer.html</code> file. Both approaches are illustrated but pre-built HTML is always fastest and most performant.
+	</p>
+	<h2>Next Steps</h2>
+	<p>
+		This implementation provides a foundation for building out a feature rich web application. If you found this implementation useful or have feedback I would love to hear from you.
+	</p>
+	</section>
+</main>
+ 

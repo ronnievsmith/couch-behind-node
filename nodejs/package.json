@@ -1,0 +1,16 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "nodemon server.mjs"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
+    "busboy": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "js-beautify": "^1.14.7",
+    "jsdom": "^22.0.0"
+  }
+}

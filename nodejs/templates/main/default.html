@@ -1,0 +1,56 @@
+<main>
+	<h1>
+		Couch Behind Node (CBN)
+	</h1>
+	<p>
+		Explore the features and interface of the <i>cluster of unreliable commodity hardware</i> (Couch) database with this basic implementation designed to operate as a foundation for building feature rich web applications. Node.js is configured as a front end web server and adds user authentication and authorization to the database system. NGINX is configured as an SSL offload reverse proxy. The three servers are containerized and easily launched via a single command line argument via Docker Compose.
+	</p>
+	<p>
+		There are two pages in addition to this homepage, namely the <i>app</i> page and the <i>fetch</i> page. The app page illustrates server side authorization based on JSON Web Token payload. Easily familiarize yourself with CouchDB's RESTful (HTTP) API on the fetch page.
+	</p>
+	<h2>Features</h2>
+	<p>
+		<ul>
+			<li>JSON Web Token (RFC 7519) Based Authentication via Email Link</li>
+			<li>Role Based Authorization</li>
+			<li>CouchDB REST API Playground Graphical User Interface</li>
+			<li>Example Web Application Page Illustrates Concepts</li>
+			<li>Easy To Follow Server and Client Code</li>
+			<li>Portable & Cloud Ready Containerized Node.js, CouchDB, and NGINX</li>
+			<li>Library Free HTML, CSS, JavaScript Using Native Node.js Modules Only *</li>
+		</ul>
+		<small>* The <a href="https://github.com/mscdex/busboy" target="_blank">Busboy</a> library is used for parsing <code>multipart/form</code> bodies. <a href="https://sendgrid.com/" target="_blank">Sendgrid</a> (free tier) is used for sending emails.</small>
+	</p>
+	<h2>Setup</h2>
+	<p>
+		This portable system consist of three servers, namely CouchDB, Node.js, and NGINX. The system self installs by means of a Docker Compose file meaning that a single command line argument will launch the build.
+		<ol>
+			<li>Docker and Git must be installed on the host machine</li>
+			<li>Provision a Sendgrid API key</li>
+			<li>Clone the CBN repository on to the host machine</li>
+			<li>Configure the <code>.env</code> file located in the root directory</li>
+			<li>(Optional) If deploying SSL save your <code>.crt</code> file in the root directory</li>
+			<li>(Optional) Point your domain name to this system</li>
+		</ol>
+	</p>
+	<h2>Run The System</h2>
+	<p>
+		Open up a terminal at the directory containing the <code>compose.yaml</code> file and issue the command <code>docker compose --env-file dev.env up --detach</code> to build and run the system of servers in development mode. For more information see <code>https://docs.docker.com/engine/reference/commandline/compose_up/</code>. Couchdb ships with an administrator graphical user interface available at <code>http://&#60;your-domain&#62;:5984/_utils</code> and the CBN homepage is available at <code>https://&#60;your-domain&#62;</code>, or <code>http://&#60;localhost&#62;</code>.
+	</p>
+	<div class="floated">
+		<img src="./media/topology.png" alt="Topology Diagram" width="356">
+	</div>
+	<h2>Basic System Architecture</h2>
+	<p>
+		All client requests except those coming from the fetch page are handled by the Node.js server. Node reads the HTTP cookies determining which requests are authorized to return data from CouchDB.
+	</p>
+	<h3>User Session State</h3>
+	<p>
+		User session state is maintained client side via JSON Web Tokens in browser cookies. The <code>user</code> object is exposed as <code>cbn.user</code> and resolves after a call to the server if the <code>authentication</code> cookie is present. Components, or sections, of the app page display per the results of behind the scenes browser XHR/fetch calls to the Node.js server.
+	</p>
+	<h3>A Note About The HTML</h3>
+	<p>
+		A <code>doc</code> module handles assembly of HTML from snippets, e.g. <code>let doc = await new Doc({'main':'app', 'aside':'app'}).build();</code>. This module assumes a simple page structure where <code>header</code>, <code>nav</code>, <code>aside</code>, <code>main</code>, and <code>footer</code> are children of an HTML <code>body</code> element. Popular templating libraries exists for those demanding more complicated builds.
+	</p>
+</main>
+ 

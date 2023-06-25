@@ -1,0 +1,409 @@
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  margin: 0;
+  display: grid;
+  grid-template-columns: [left] 196px [nav] 1fr [aside] minmax(212px, 256px) [right];
+  grid-template-rows: [top] 56px [header] 1fr [footer] fit-content(256px) [bottom];
+  grid-gap: 4px;
+  /*    outline: 1px dashed #616161;*/
+  min-height: 100vh;
+  min-width: 0;
+  font-family: Arial, sans-serif;
+}
+
+body>aside {
+  overflow: hidden;
+  min-width: 0;
+  /*	outline: 1px dashed #d50000;*/
+  grid-column-start: aside;
+  grid-column-end: right;
+  grid-row-start: header;
+  grid-row-end: footer;
+  padding: 12px;
+}
+
+body>aside>section {
+  margin: 0px 12px 0px 12px;
+}
+
+body>dialog {
+  align-self: center;
+  width: 500px;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0px 0px 30px;
+}
+
+body>header {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-content: center;
+  align-items: flex-start;
+  grid-row: row-line-1;
+  min-width: 0;
+  /*	outline: 1px dashed #00c853;*/
+  grid-column-start: left;
+  grid-column-end: right;
+  grid-row-start: top;
+  grid-row-end: header;
+}
+
+body>header a {
+  text-decoration: none;
+  color: inherit;
+}
+
+body>header>nav {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+
+body>header>nav>div:nth-of-type(1) {
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  margin-left: 18px;
+  display: flex;
+}
+
+body>header>nav>div:nth-of-type(1) a {
+  display: flex;
+  align-items: center;
+}
+
+body>header>nav>div:nth-of-type(2) {
+  flex: 0 1 auto;
+  justify-content: flex-end;
+  margin-right: 18px;
+}
+
+body>main {
+  /*background:white;*/
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  /*    outline 1px dashed #212121;*/
+  overflow: hidden;
+  /* needed for scroll suppression */
+  min-width: 0;
+  /* needed for scroll suppression */
+  margin: 18px;
+  grid-column-start: nav;
+  grid-column-end: aside;
+  grid-row-start: header;
+  grid-row-end: footer;
+}
+
+body>nav {
+  overflow: hidden;
+  /* needed for scroll suppression */
+  min-width: 0;
+  /* needed for scroll suppression */
+  /*	outline: 1px dashed #2962ff;*/
+  grid-column-start: left;
+  grid-column-end: nav;
+  grid-row-start: header;
+  grid-row-end: footer;
+}
+
+body>nav ul {
+  list-style: none;
+  text-align: left;
+  padding: 0px;
+}
+
+body>nav>details ul {
+  padding: 0;
+}
+
+body>footer {
+  grid-column-start: left;
+  grid-column-end: right;
+  overflow: hidden;
+  /* needed for scroll suppression */
+  min-width: 0;
+  /* needed for scroll suppression */
+  /*    outline: 1px dashed #ffd600;*/
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: small;
+}
+
+body>footer>p {
+  margin: 2px 24px;
+  text-align: center;
+}
+
+button {
+  border: 4px solid;
+  color: white;
+  border-radius: 4px;
+}
+
+label>input {
+  margin: 0px 12px;
+}
+
+summary:hover {
+  cursor: pointer;
+}
+
+#account:hover {
+  cursor: pointer;
+}
+
+#account {
+  color: #2962ff
+}
+
+#account-div {
+  max-width: 160px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#add-file {
+  margin-bottom: 24px;
+}
+
+#add-header {
+  float: right;
+}
+
+#auth-button {}
+
+#bucket-output {
+  margin: 12px 24px;
+}
+
+#email {
+  width: 400px;
+}
+
+#url {
+  min-width: 512px;
+}
+
+#close-dialog-button {
+  margin-right: 24px;
+}
+
+#couch-nav {
+  list-style-type: none;
+  padding: 0;
+
+  margin: 0;
+}
+
+#couch-nav details {
+  margin-left: 18px;
+  margin-top: 18px;
+}
+
+#couch-nav ul {
+  margin: 0px;
+}
+
+#couch-nav code {
+  cursor: pointer;
+}
+
+#headers label {
+  margin-left: 12px;
+}
+
+#headers input[type=checkbox] {
+  vertical-align: middle;
+}
+
+#header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#header-logo>div:nth-of-type(1) {
+  margin-top: 4px;
+}
+
+#header-logo:hover {
+  cursor: pointer;
+}
+
+#home-nav {
+  margin: 48px;
+}
+
+#home-nav li {
+  margin: 12px 0px;
+}
+
+#registration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+#registration div {
+  margin: 12px;
+}
+
+#registration section {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+#registration fieldset>input {
+  float: right;
+}
+
+#registration fieldset label {
+  display: inline-block;
+  width: 124px;
+  text-align: right;
+}
+
+.bg-red {
+  background-color: #d50000;
+  border-color: #d50000;
+}
+
+.bg-green {
+  background-color: #00c853;
+  border-color: #00c853;
+}
+
+.bg-yellow {
+  background-color: #ffd600;
+  border-color: #ffd600;
+}
+
+.bg-orange {
+  background-color: #ff6d00;
+  border-color: #ff6d00;
+}
+
+.bg-deep-orange {
+  background-color: #dd2c00;
+  border-color: #dd2c00;
+}
+
+.bg-purple {
+  background-color: #aa00ff;
+  border-color: #aa00ff;
+}
+
+.delete:hover {
+  cursor: pointer;
+}
+
+.download {
+  margin-right: 6px;
+}
+
+.download:hover {
+  cursor: pointer;
+}
+
+.fetch {
+  color: white;
+  border-radius: 4px;
+}
+
+.file {
+  margin: 6px 0px;
+}
+
+.floated {
+  float: left;
+  width: 356px;
+  margin: 24px;
+}
+
+.toast {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -50px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 300px;
+  /* Need a specific value to work */
+  height: 50px;
+  background-color: #212121;
+  color: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: bottom 0.5s 0.3s;
+  border-radius: 4px;
+}
+
+.toast>span {
+  margin: 12px
+}
+
+.show-toast {
+  bottom: 0px;
+}
+
+.button {
+  background-color: #2962ff;
+  color: white;
+  border: 4px solid #2962ff;
+  border-radius: 4px;
+}
+
+.button:hover {
+  cursor: pointer;
+}
+
+.material-svg {
+  height: 1em;
+  width: 1em;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.material-svg-lg {
+  height: 1.3em;
+  width: 1.3em;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.wide-nav {
+  grid-template-columns: [left] 288px [nav] 1fr [aside] minmax(396px, 440px) [right];
+}
+
+.bg-gray {
+  background: #fafafa;
+}
+
+.pre {
+  white-space: pre;
+}
+
+.right {
+  float: right;
+}
+
+@media screen and (max-width: 767px) {
+  body {
+    grid-template-columns: [left] 0px [nav] 1fr [aside] 0px [right];
+  }
+
+}

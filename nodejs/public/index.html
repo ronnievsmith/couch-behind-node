@@ -1,0 +1,153 @@
+<!DOCTYPE html><html lang="en" prefix="og: http://ogp.me/ns#"><head>
+  <meta charset="utf-8">
+  <title>Node Web Server</title>
+  <meta name="description" content="Node Web Server">
+  <meta name="author" content="Ronnie Royston">
+  <link rel="icon" type="image/x-icon" href="/media/logo-48x48.png">
+  <link rel="stylesheet" href="style.css">
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head><body><header>
+  <nav>
+    <div>
+      <div id="header-logo">
+        <div>
+          <img src="/media/logo.png" height="48" alt="logo">
+        </div>
+        <div>
+          <div>CBN</div>
+          <div><small>Couch Behind Node</small></div>
+        </div>
+        &nbsp;
+      </div>
+    </div>
+    <div id="account-div">
+      <span id="account"></span>
+    </div>
+  </nav>  
+</header><nav>
+  <section id="home-nav">
+    <h4>Navigation</h4>
+    <ul>
+      <li><a href="/app">App</a></li>
+      <li><a href="/fetch">Fetch</a></li>
+    </ul>
+  </section>
+</nav><aside>
+  <h4>What Is Node.js?</h4>
+  <figure style="margin: 0">
+  <blockquote style="margin: 0">
+  <p>
+    Node.js® is a cross-platform, open-source server environment that can run on Windows, Linux, Unix, macOS, and more. Node.js is a back-end JavaScript runtime environment, runs on the <a href="https://v8.dev/">V8 JavaScript Engine</a><a>, and executes JavaScript code outside a web browser.
+  </a></p><a>
+  <p>
+    Node.js lets developers use JavaScript to write command line tools and for server-side scripting. The ability to run JavaScript code on the server is often used to generate dynamic web page content before the page is sent to the user's web browser. Consequently, Node.js represents a "JavaScript everywhere" paradigm.
+  </p>
+  </a></blockquote><a>
+  </a><figcaption><a>
+    <cite>- </cite></a><a href="https://en.wikipedia.org/wiki/Node.js">Wikipedia</a> Introduction to Node.js
+  </figcaption>
+</figure>
+</aside><main>
+	<h1>
+		Couch Behind Node (CBN)
+	</h1>
+	<p>
+		Explore the features and interface of the <i>cluster of unreliable commodity hardware</i> (Couch) database with this basic implementation designed to operate as a foundation for building feature rich web applications. Node.js is configured as a front end web server and adds user authentication and authorization to the database system. NGINX is configured as an SSL offload reverse proxy. The three servers are containerized and easily launched via a single command line argument via Docker Compose.
+	</p>
+	<p>
+		There are two pages in addition to this homepage, namely the <i>app</i> page and the <i>fetch</i> page. The app page illustrates server side authorization based on JSON Web Token payload. Easily familiarize yourself with CouchDB's RESTful (HTTP) API on the fetch page.
+	</p>
+	<h2>Features</h2>
+	<p>
+		</p><ul>
+			<li>JSON Web Token (RFC 7519) Based Authentication via Email Link</li>
+			<li>Role Based Authorization</li>
+			<li>CouchDB REST API Playground Graphical User Interface</li>
+			<li>Example Web Application Page Illustrates Concepts</li>
+			<li>Easy To Follow Server and Client Code</li>
+			<li>Portable &amp; Cloud Ready Containerized Node.js, CouchDB, and NGINX</li>
+			<li>Library Free HTML, CSS, JavaScript Using Native Node.js Modules Only *</li>
+		</ul>
+		<small>* The <a href="https://github.com/mscdex/busboy" target="_blank">Busboy</a> library is used for parsing <code>multipart/form</code> bodies. <a href="https://sendgrid.com/" target="_blank">Sendgrid</a> (free tier) is used for sending emails.</small>
+	<p></p>
+	<h2>Setup</h2>
+	<p>
+		This portable system consist of three servers, namely CouchDB, Node.js, and NGINX. The system self installs by means of a Docker Compose file meaning that a single command line argument will launch the build.
+		</p><ol>
+			<li>Docker and Git must be installed on the host machine</li>
+			<li>Provision a Sendgrid API key</li>
+			<li>Clone the CBN repository on to the host machine</li>
+			<li>Configure the <code>.env</code> file located in the root directory</li>
+			<li>(Optional) If deploying SSL save your <code>.crt</code> file in the root directory</li>
+			<li>(Optional) Point your domain name to this system</li>
+		</ol>
+	<p></p>
+	<h2>Run The System</h2>
+	<p>
+		Open up a terminal at the directory containing the <code>compose.yaml</code> file and issue the command <code>docker compose --env-file dev.env up --detach</code> to build and run the system of servers in development mode. For more information see <code>https://docs.docker.com/engine/reference/commandline/compose_up/</code>. Couchdb ships with an administrator graphical user interface available at <code>http://&lt;your-domain&gt;:5984/_utils</code> and the CBN homepage is available at <code>https://&lt;your-domain&gt;</code>, or <code>http://&lt;localhost&gt;</code>.
+	</p>
+	<div class="floated">
+		<img src="./media/topology.png" alt="Topology Diagram" width="356">
+	</div>
+	<h2>Basic System Architecture</h2>
+	<p>
+		All client requests except those coming from the fetch page are handled by the Node.js server. Node reads the HTTP cookies determining which requests are authorized to return data from CouchDB.
+	</p>
+	<h3>User Session State</h3>
+	<p>
+		User session state is maintained client side via JSON Web Tokens in browser cookies. The <code>user</code> object is exposed as <code>cbn.user</code> and resolves after a call to the server if the <code>authentication</code> cookie is present. Components, or sections, of the app page display per the results of behind the scenes browser XHR/fetch calls to the Node.js server.
+	</p>
+	<h3>A Note About The HTML</h3>
+	<p>
+		A <code>doc</code> module handles assembly of HTML from snippets, e.g. <code>let doc = await new Doc({'main':'app', 'aside':'app'}).build();</code>. This module assumes a simple page structure where <code>header</code>, <code>nav</code>, <code>aside</code>, <code>main</code>, and <code>footer</code> are children of an HTML <code>body</code> element. Popular templating libraries exists for those demanding more complicated builds.
+	</p>
+</main>
+ <footer>
+  <p>
+    MIT License Copyright 2023 <a href="https://ronnieroyston.com" target="_blank">Ronnie Royston</a>
+  </p>
+  <p>
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  </p>
+</footer><dialog>
+  <section id="authenticate" hidden="">
+  	<h3>Authenticate</h3>
+    <fieldset>
+      <legend>Your Account</legend>
+      <div>
+        <label for="email">Email: </label> 
+        <input type="email" name="email" id="email" placeholder="Email" minlength="3" maxlength="320" required="">
+      </div>
+    </fieldset>
+    <aside>
+      <p>
+        An email will be sent to you upon submission of this form. Click the link in the email to complete your registration.
+      </p>
+    </aside>
+    <span class="right">
+      <button class="button close-dialog-button">Close</button>
+      <button id="auth-create-button" class="button">Submit</button>
+    </span>
+  </section>
+  <section id="log-out" hidden="">
+    <h3>Log Out</h3>
+    <aside>
+      <p>
+        Click the button below to log out of your account.
+      </p>
+    </aside>
+    <span class="right">
+      <button class="close-dialog-button button">Close</button>
+      <button id="auth-delete-button" class="button">Log Out</button>
+    </span>
+  </section>
+</dialog><div class="toast">
+  <span>
+  </span>
+</div><script src="script.js"></script></body></html>

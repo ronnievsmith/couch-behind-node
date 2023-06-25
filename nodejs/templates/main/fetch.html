@@ -1,0 +1,82 @@
+<main>
+  <h1>Couch DB REST API</h1>
+  <p>
+  	This page should not exist in a production application but is here for familiarizing users with the CouchDB HTTP API. In a live app all client HTTP requests should route through the NodeJS server - <i>Couch Behind Node</i>. The CouchDB server listens on port 5984, or <code>http://localhost:5984</code>.
+  </p>
+	<details class="bg-gray" open>
+	<br>
+	<summary>
+		<span id="method">GET</span>
+		<span id="path"></span>
+		<span>HTTP/1.1</span>
+	</summary>
+	<fieldset id="authority">
+		<legend>Authority</legend>
+		<label for="url">URL:</label>
+		<input type="text" name="url" id="url" placeholder="https://dummyjson.com/products/1"></input>
+	</fieldset>
+	<br>
+	</details>
+	<br>
+	<details class="bg-gray" open>
+		<summary>
+			Fetch API Init Object
+		</summary>
+		<br>
+		<fieldset>
+			<legend>
+				<input type="checkbox" id="basic-auth-cbx">
+				Basic Authentication
+			</legend>
+			<label for="username">Username:
+			<input type="text" name="username" id="username" placeholder=""></input>
+			</label>
+			<label for="password">Password:
+			<input type="text" name="password" id="password" placeholder=""></input>
+			</label>
+		</fieldset>
+		<br>
+		<fieldset id="headers">
+			<legend>
+				Headers
+			</legend>
+			<button id="add-header" class="button">Add</button>
+		</fieldset>
+		<br>
+		<fieldset>
+			<legend>
+				<input type="checkbox" id="include-body-cbx">
+				Message Body
+			</legend>
+			<label for="mime-type">MIME type:</label>
+			<select name="mime-type" id="mime-type">
+			    <option value="application/json" selected>application/json</option>
+			    <option value="application/octet-stream">application/octet-stream</option>
+			    <option value="application/xhtml+xml">application/xhtml+xml</option>
+			    <option value="application/xml">application/xml</option>
+			    <option value="text/css">text/css</option>
+			    <option value="text/csv">text/csv</option>
+			    <option value="text/html">text/html</option>
+			    <option value="text/javascript">text/javascript</option>
+			    <option value="text/plain">text/plain</option>
+			    <option value="multipart/form-data">multipart/form-data</option>
+			    <option value="application/x-www-form-urlencoded">application/x-www-form-urlencoded</option>
+			</select>
+			<br><br>
+			<textarea id="message-body" rows="5" cols="66"></textarea>
+		</fieldset>
+	</details>
+	<div id="full-url"></div>
+	<br>
+	<span style="float:right">
+		<button class="fetch bg-red">DELETE</button>
+		<button class="fetch bg-green">GET</button>
+		<button class="fetch bg-yellow">HEAD</button>
+		<button class="fetch bg-orange">POST</button>
+		<button class="fetch bg-purple">PUT</button>
+	</span>
+
+	</main>
+<script>
+
+</script>
