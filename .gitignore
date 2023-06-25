@@ -2,7 +2,6 @@ couchdb/.delete
 couchdb/shards
 couchdb/_dbs.couch
 couchdb/_nodes.couch
-node_modules/
 logs/
 *.key
 *.crt
