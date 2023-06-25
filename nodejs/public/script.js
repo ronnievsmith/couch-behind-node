@@ -244,9 +244,12 @@ var cbn = (function() {
       responseHeading.appendChild(responseHeadingText);
       let res = await response;
       try {
-        res = JSON.parse(res);
-      } finally {
-        responseBodyOutput.innerHTML = JSON.stringify(res, null, 2)
+        let jsonData = await response.json();
+        jsonData = JSON.stringify(jsonData, null, 2)
+        responseBodyOutput.innerHTML = jsonData;
+      } catch {
+        let txt = await response.text()
+        responseBodyOutput.innerHTML = txt
       }
     } catch (error) {
       responseBodyOutput.innerHTML = JSON.stringify(error, null, 2);
