@@ -1,4 +1,10 @@
-# Couch Behind Node, An Authentication, Authorization, Accounting Web Service System Containerized w/ NGINX Front End
+# Couch Behind Node
+ - Authentication, Authorization, Accounting for CouchDB
+ - Framework free, library free web service system 
+ - Containerized w/ NGINX front end
+ - Great starting point for your next web app project
+ - Launch all three servers with single command
+ - HTTP API playground familiarizes users with CouchDB
 
 ## Summary
 JSON Web Tokens minted from email link authentication delivers client side session management. Single "docker compose up" command launches open source nginx, nodejs, and couchdb servers configured with host folders bind mounted enabling live code updates (e.g. nodemon) without requiring container restarts/rebuilds.
@@ -31,3 +37,5 @@ Install and then initialize Git on the host computer by issuing `git init`. Clon
 ```
 ### 3. Run the System
 Open up a terminal at the directory containing the `compose.yaml` file and issue the command `docker compose up` to build and run the system of servers. For more information see https://docs.docker.com/engine/reference/commandline/compose_up/. The couchdb adminitrator graphical user interface is available at `http://localhost:5984` and the homepage is available at `http://localhost`.
+
+Further instructions available on the homepage at `http://localhost`.
