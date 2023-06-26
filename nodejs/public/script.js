@@ -90,16 +90,37 @@ var cbn = (function() {
   }
 
   if(document.querySelector("#add-header")){
-    document.querySelector("#add-header").addEventListener("click",function(e){
+    document.querySelector("#add-header").addEventListener("click", function(e){
       document.querySelector("#headers").appendChild(new HeaderInputs());
       addBlurToHeaderInputs();
       addChangeToHeaderCheckboxes();
-      attachClickToDeletes();
+      attachClickToHeaderDeletes();
     });
   }
 
+  function attachClickToBucketDeletes(){
+    document.querySelectorAll("#bucket-output .delete").forEach(function (svg){
+      svg.addEventListener("click", async function(e) {
+        let rev = document.querySelector("#bucket-output").dataset.rev; // ---------------------------------------------------
+        let name = e.target.dataset.name;
+        let path = e.target.dataset.href + "?rev=" + rev
+        console.log(path)
+        let deleteAttachmentResponse = await fetch(path, {
+          method: "DELETE"
+        });
+        deleteAttachmentResponse = await deleteAttachmentResponse.json();
+        if(deleteAttachmentResponse.ok){
+          document.querySelector("#bucket-output").dataset.rev = deleteAttachmentResponse.rev;
+          document.querySelector(`[data-name='${name}']`).parentElement.remove();
+          toast("File Deleted");
+        }
+        //console.log(deleteAttachmentResponse)
+      })
+    })
+  }
+
   function addBlurToBodyInput(){
-    document.querySelector("#message-body").addEventListener("blur",function(){
+    document.querySelector("#message-body").addEventListener("blur", function(){
       let o = {};
       o.c = document.querySelector("#include-body-cbx").checked;
       o.v = document.querySelector("#message-body").value;
@@ -154,7 +175,7 @@ var cbn = (function() {
     })
   }
 
-  function attachClickToDeletes(){
+  function attachClickToHeaderDeletes(){
     document.querySelectorAll("#headers .delete").forEach(function (svg){
       svg.addEventListener("click", function(e) {
         let thisDiv = e.target.parentElement;
@@ -242,7 +263,7 @@ var cbn = (function() {
       }
       let responseHeadingText = document.createTextNode(protocol + " " + response.status + " " + responseOK)
       responseHeading.appendChild(responseHeadingText);
-      let res = await response;
+      // let res = await response;
       try {
         let jsonData = await response.json();
         jsonData = JSON.stringify(jsonData, null, 2)
@@ -361,7 +382,7 @@ var cbn = (function() {
         });
         addBlurToHeaderInputs();
         addChangeToHeaderCheckboxes();
-        attachClickToDeletes();
+        attachClickToHeaderDeletes();
         addBlurToBodyInput()
       }
     }
@@ -399,17 +420,24 @@ var cbn = (function() {
   }
 
   class FileElement {
-    constructor(id = "", rev = "", name = "", length = 0) {
+    constructor(id = "", name = "", length = 0) {
       this.div = document.createElement("div");
-      this.txt = document.createTextNode(name + " (" + formatBytes(length) + ")");
-      this.a = document.createElement("a");
-      this.a.href = thisURL.origin + "/buckets/" + id + "/" + name;
-      this.a.setAttribute("target", "_blank");
-      this.a.appendChild(new DownloadSVG());
-      this.div.appendChild(this.a);
+      this.txt = document.createTextNode(decodeURIComponent(name) + " (" + formatBytes(length) + ")");
+      this.endpoint = thisURL.origin + "/buckets/" + id + "/" + encodeURIComponent(name);
+
+      //this.deleteButton = document.createElement("span");
+      this.deleteButton = new DeleteSVG();
+      this.deleteButton.dataset.href = this.endpoint
+      //this.deleteButton.appendChild(new DeleteSVG());
+      this.deleteButton.dataset.name = encodeURIComponent(name);
+      this.downloadAnchor = document.createElement("a");
+      this.downloadAnchor.href = this.endpoint
+      this.downloadAnchor.setAttribute("target", "_blank");
+      this.downloadAnchor.appendChild(new DownloadSVG());
+      this.div.appendChild(this.deleteButton);
+      this.div.appendChild(this.downloadAnchor);
       this.div.appendChild(this.txt);
-      this.div.dataset.rev = rev;
-      this.div.dataset.id = id;
+      
       this.div.classList.add("file")
       this.fragment = new DocumentFragment();
       this.fragment.appendChild(this.div);
@@ -425,10 +453,17 @@ var cbn = (function() {
         //console.log(input.files[index].name, " ", input.files[index].size, " ", input.files[index].type)
         formData.append("file", input.files[index]);
       });
-      return await fetch(thisURL.origin + "/buckets", {
+      let writeBucketResponse = await fetch(thisURL.origin + "/buckets", {
         method: "POST",
         body: formData
       });
+      writeBucketResponse = await writeBucketResponse.json();
+      if(writeBucketResponse["rev"]){
+        document.querySelector("#bucket-output").dataset.rev = writeBucketResponse["rev"];
+        document.querySelector("#bucket-output").dataset.id = writeBucketResponse["id"];
+      }
+      readBuckets();
+      //console.log(writeBucketResponse);
     })
   }
 
@@ -540,14 +575,19 @@ var cbn = (function() {
     return cookie;
   }
 
-  async function postLoad() {
+  async function afterAuth() {
     if (pub.user) {
       document.querySelector("#account").textContent = pub.user.email;
       if (document.querySelector("#bucket-section")) { // if buckets section fetch users bucket info
+        document.querySelector("#add-file").hidden = false;
         await readBuckets();
       }
     } else {
       document.querySelector("#account").textContent = "Sign In";
+      if (document.querySelector("#bucket-section")) {
+        document.querySelector("#add-file").hidden = true;
+        // document.querySelector("#bucket-output").innerHTML = "Sign in to access bucket."
+      }
     }
   }
 
@@ -576,7 +616,7 @@ var cbn = (function() {
     } else {
       delete pub.user;
     }
-    postLoad();
+    afterAuth();
   }
 
   async function readBuckets() {
@@ -589,13 +629,20 @@ var cbn = (function() {
       },
       body: JSON.stringify(body)
     });
-    let attachments = Object.keys(res["_attachments"]);
-    document.querySelector("#bucket-output").innerHTML = "";
-    attachments.forEach(function(attachment) {
-      let fileLength = res["_attachments"][attachment]["length"];
-      let fileElement = new FileElement(res["_id"], res["_rev"], attachment, fileLength);
-      document.querySelector("#bucket-output").appendChild(fileElement);
-    })
+    if(res){
+      if(res["_attachments"]){
+        let attachments = Object.keys(res["_attachments"]);
+        document.querySelector("#bucket-output").innerHTML = "";
+        document.querySelector("#bucket-output").dataset.id = res["_id"];
+        attachments.forEach(function(attachment) {
+          let fileLength = res["_attachments"][attachment]["length"];
+          let fileElement = new FileElement(res["_id"], attachment, fileLength);
+          document.querySelector("#bucket-output").dataset.rev = res["_rev"];
+          document.querySelector("#bucket-output").appendChild(fileElement);
+        })
+        attachClickToBucketDeletes();
+      }      
+    }
   }
 
   function showDialog() {

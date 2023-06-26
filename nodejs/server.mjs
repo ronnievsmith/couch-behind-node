@@ -167,25 +167,14 @@ const SERVER = http.createServer(async function(request, response) {
             const req = http.request(options, (res) => {
               // console.log(`COUCH RESPONSE STATUS: ${res.statusCode}`);
               // console.log(`COUCH RESPONSE HEADERS: ${JSON.stringify(res.headers, null, 2)}`);
-              res.setEncoding('utf8');
-              res.on('data', (chunk) => {
-              });
-              res.on('end', () => {
-                console.log('No more data in response from couch.');
-              });
-            });
-            req.on('error', (e) => {
-              console.error(`problem with couch request: ${e.message}`);
+              res.pipe(response);
             });
             file.pipe(req)
           });
           bb.on('field', (name, val, info) => {
-            console.log(`Field [${name}]: value: %j`, val);
+            //console.log(`Field [${name}]: value: %j`, val);
           });
           bb.on('close', () => {
-            console.log('Done parsing form!');
-            response.writeHead(303, { Connection: 'close', Location: '/' });
-            response.end();
           });
           request.pipe(bb);
         } else { // =========================================== NOT a file upload parse this POST request like usual
@@ -197,10 +186,10 @@ const SERVER = http.createServer(async function(request, response) {
             reqBody = Buffer.concat(reqBody).toString();
             try {
               reqBody = JSON.parse(reqBody);
-              if(reqBody.action === "create"){ //==================================================================
+              if(reqBody.action === "create"){ // ==================================================================
                 let docID = undefined;
               }
-              if(reqBody.action === "read"){ //====================================================================
+              if(reqBody.action === "read"){ // ====================================================================
                 console.log("read POST hit")
                 let queryBody = {
                   "selector": {
@@ -209,9 +198,9 @@ const SERVER = http.createServer(async function(request, response) {
                 }
                 await db.http.post('/buckets/_find',JSON.stringify(queryBody))
                 .then(async function (res) {
-                  if(res.body.docs.length > 0){ // ====================================================bucket found
+                  if(res.body.docs.length > 0){ // =====================================================bucket found
                     console.log("bucket found");
-                    if(res.body.docs[0].owner === user){ // ============================================ authorized
+                    if(res.body.docs[0].owner === user){ // ============================================= authorized
                       response.writeHead(200, { 'Content-Type': 'text/plain' });
                       response.end(JSON.stringify(res.body.docs[0]));
                     } else { // ===================================================================== not authorized
@@ -244,9 +233,14 @@ const SERVER = http.createServer(async function(request, response) {
         let pathArray = new URL(request.url, `http://${request.headers.host}`).pathname.split("/");
         let docID = pathArray[2];
         let fileName = pathArray[3];
+        // let queryBody = {
+        //   "selector": {
+        //     "owner": {"$eq": user}
+        //   }         
+        // }
         let queryBody = {
           "selector": {
-            "owner": {"$eq": user}
+            "_id": {"$eq": docID}
           }         
         }
         await db.http.post('/buckets/_find', JSON.stringify(queryBody))
@@ -279,6 +273,55 @@ const SERVER = http.createServer(async function(request, response) {
         .catch((e) => {
           console.log("error is " + e);
         })
+      }
+      if (request.method === 'DELETE') {
+        console.log("bucket DELETE path hit: " + request.headers["If-Match"])
+        let parsedURL = new URL(request.url, `http://${request.headers.host}`);
+        let pathArray = parsedURL.pathname.split("/");
+        let docID = pathArray[2];
+        let fileName = pathArray[3];
+        let rev = parsedURL.searchParams.get('rev');
+        //let rev = request.headers["If-Match"];
+        //rev = rev.replace("rev=","");
+        let queryBody = {
+          "selector": {
+            "_id": {"$eq": docID}
+          }         
+        }
+        await db.http.post('/buckets/_find', JSON.stringify(queryBody))
+        .then(async function (res) {
+          if(res.body.docs.length > 0){                        // bucket found
+
+            if(res.body.docs[0].owner === user){ // ============================= authorized
+              const opts = {
+                host: COUCHDB_HOSTNAME,
+                port: 5984,
+                path: '/buckets/' + docID + "/" + fileName,
+                method: 'DELETE',
+                headers: {
+                  "Authorization" : "Basic " + btoa(COUCHDB_USERNAME + ":" + COUCHDB_PASSWORD),
+                  "If-Match" : rev
+                },
+              };
+              const creq = http.request(opts, (cres) => {
+                cres.pipe(response);
+              });
+              request.pipe(creq);
+            } else { // ========================================================= not authorized
+              res.writeHead(401, { 'Content-Type': 'text/plain' });
+              res.end('unauthorized');
+            }
+          } else {                                             // bucket not found
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('not found');
+          }
+        })
+        .catch((e) => {
+          console.log("error is " + e);
+        })
+
+
+
       }
     } else {
       response.writeHead(401, { 'Content-Type': 'text/plain' });
