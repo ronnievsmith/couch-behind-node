@@ -1,7 +1,4 @@
-//const {generateKeyPairSync,createSign,createVerify,KeyObject,randomUUID} = await import('node:crypto');
 const {createSign,createVerify} = await import('node:crypto');
-// const signatureFunction = createSign('RSA-SHA256');
-// const verifyFunction = createVerify('RSA-SHA256');
 import { Buffer } from 'node:buffer';
 const headerObject = {
   alg: 'HS256',

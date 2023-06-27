@@ -1,14 +1,8 @@
 /*
- * @license
- * "Node Web Server"
- * Ronnie Royston (https://ronnieroyston.com)
- * Creative Commons License BY 4.0 (http://creativecommons.org/licenses/by/4.0/)
+ Ronnie Royston (https://ronnieroyston.com)
 */
-
 import { promises as fs } from 'fs';
-import path from "node:path";
 import {JSDOM} from "jsdom";
-const ROOT = "public/";
 
 class Doc {
   constructor(options = {}) {

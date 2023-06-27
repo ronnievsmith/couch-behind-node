@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "start": "nodemon server.mjs"
+    "start": "nodemon --legacy-watch server.mjs"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"

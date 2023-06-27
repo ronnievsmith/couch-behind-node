@@ -1,8 +1,8 @@
 import req from './req.mjs';
-const COUCHDB_HOSTNAME = "couchdb";
-const COUCHDB_USERNAME = "admin";
-const COUCHDB_PASSWORD = "admin";
-
+import 'dotenv/config';
+const COUCHDB_HOSTNAME = process.env.COUCHDB_HOSTNAME || "couchdb";
+const COUCHDB_USERNAME = process.env.COUCHDB_USERNAME || "admin";
+const COUCHDB_PASSWORD = process.env.COUCHDB_PASSWORD || "admin";
 class Options {
   constructor() {
     this.host = COUCHDB_HOSTNAME;

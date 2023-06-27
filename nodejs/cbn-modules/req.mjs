@@ -10,13 +10,11 @@ function http(options,body){
       res.on('end', () => {
         try {
           data = JSON.parse(data);
-        } catch {
-          
+        } finally {
+          resolve({"body":data,"statusCode":res.statusCode,"headers":res.headers})
         }
-        resolve({"body":data,"statusCode":res.statusCode,"headers":res.headers})
       });
     });
-
     req.on('error', (e) => {
       reject(e);
       console.error(`problem with request: ${e.message}`);
