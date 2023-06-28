@@ -58,6 +58,7 @@ async function route(request,response,user){
 	}
 	// ==================================================================================================================
 	if (request.method == 'POST') {
+		console.log("POST hit")
 	  let reqBody = '';
 	  request.on('data', chunk => {
 	    reqBody += chunk.toString(); // convert Buffer to string
@@ -65,6 +66,7 @@ async function route(request,response,user){
 	  request.on('end', async () => {
 	    try {
 	      reqBody = JSON.parse(reqBody);
+	      console.log(JSON.stringify(reqBody))
 	      if(reqBody.action === "create"){
 	        let email = reqBody.email;
 	        let mangoBody = {
@@ -77,6 +79,7 @@ async function route(request,response,user){
 	          let path = '/users/';
 	          let expiration = Date.now() + DAY;
 	          let body = {};
+	          console.log(JSON.stringify(res.body))
 	          if(res.body.docs.length > 0){                      // user record found so obj.assign
 	            body = Object.assign({}, res.body.docs[0]);
 	            path = '/users/' + res.body.docs[0]["_id"];
@@ -164,8 +167,8 @@ function getKeys() {
         format: 'pem',
       }
     });
-    fs.writeFileSync("../public.pem", publicKey);
-    fs.writeFileSync("../private.pem", privateKey);
+    fs.writeFileSync("./public.pem", publicKey);
+    fs.writeFileSync("./private.pem", privateKey);
     return {privateKey, publicKey};
   }
 }

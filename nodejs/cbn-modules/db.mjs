@@ -1,13 +1,13 @@
 import req from './req.mjs';
 import 'dotenv/config';
-const COUCHDB_HOSTNAME = process.env.COUCHDB_HOSTNAME || "couchdb";
-const COUCHDB_USERNAME = process.env.COUCHDB_USERNAME || "admin";
-const COUCHDB_PASSWORD = process.env.COUCHDB_PASSWORD || "admin";
+// const COUCHDB_HOSTNAME = process.env.COUCHDB_HOSTNAME;
+// const COUCHDB_USER = process.env.COUCHDB_USER;
+// const COUCHDB_PASSWORD = process.env.COUCHDB_PASSWORD;
 class Options {
   constructor() {
-    this.host = COUCHDB_HOSTNAME;
+    this.host = process.env.COUCHDB_HOSTNAME;
     this.headers = {
-      "Authorization" : "Basic " + btoa(COUCHDB_USERNAME + ":" + COUCHDB_PASSWORD),
+      "Authorization" : "Basic " + btoa(process.env.COUCHDB_USER + ":" + process.env.COUCHDB_PASSWORD),
       "Content-Type" : "application/json"
     };
     this.port = 5984;

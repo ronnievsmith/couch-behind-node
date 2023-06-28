@@ -1,6 +1,7 @@
 import db from './db.mjs';
 import busboy from 'busboy';
 import http from "node:http";
+const {randomUUID} = await import('node:crypto');
 import 'dotenv/config';
 
 async function route(request,response,user){
@@ -11,23 +12,24 @@ async function route(request,response,user){
         const bb = busboy({ headers: request.headers });
         bb.on('file', (name, file, info) => { //=================================================================
           const { filename, encoding, mimeType } = info;
-          //console.log(`File [${name}]: filename: %j, encoding: %j, mimeType: %j`, filename, encoding, mimeType);
+          console.log(`File [${name}]: filename: %j, encoding: %j, mimeType: %j`, filename, encoding, mimeType);
           const options = {
             hostname: process.env.COUCHDB_HOSTNAME,
             port: 5984,
             path: '/buckets/' + bucketDoc["_id"] + "/" + encodeURIComponent(filename),
             method: 'PUT',
             headers: {
-              "Authorization" : "Basic " + btoa(process.env.COUCHDB_USERNAME + ":" + process.env.COUCHDB_PASSWORD),
+              "Authorization" : "Basic " + btoa(process.env.COUCHDB_USER + ":" + process.env.COUCHDB_PASSWORD),
               "Content-Type" : mimeType,
               "If-Match" : bucketDoc["_rev"],
             }
           };
+          console.log("putting file " + JSON.stringify(options))
           const req = http.request(options, (res) => {
-            // console.log(`COUCH RESPONSE STATUS: ${res.statusCode}`);
-            // console.log(`COUCH RESPONSE HEADERS: ${JSON.stringify(res.headers, null, 2)}`);
+            console.log(`COUCH RESPONSE STATUS: ${res.statusCode}`);
+            console.log(`COUCH RESPONSE HEADERS: ${JSON.stringify(res.headers, null, 2)}`);
             res.pipe(response);
-          });
+          })
           file.pipe(req)
         });
         bb.on('field', (name, val, info) => {
@@ -72,7 +74,7 @@ async function route(request,response,user){
                 }
               })
               .catch((e) => {
-                console.log("error is " + e);
+                console.log("Bucket Read via Mango error is " + e);
               })
             }
             if(reqBody.action === "update"){ //====================================================================
@@ -107,7 +109,7 @@ async function route(request,response,user){
               path: '/buckets/' + docID + "/" + fileName,
               method: 'GET',
               headers: {
-                "Authorization" : "Basic " + btoa(process.env.COUCHDB_USERNAME + ":" + process.env.COUCHDB_PASSWORD),
+                "Authorization" : "Basic " + btoa(process.env.COUCHDB_USER + ":" + process.env.COUCHDB_PASSWORD),
               },
             };
             const creq = http.request(opts, (cres) => {
@@ -124,7 +126,7 @@ async function route(request,response,user){
         }
       })
       .catch((e) => {
-        console.log("error is " + e);
+        console.log("Mango error is " + e);
       })
     }
     if (request.method === 'DELETE') {
@@ -149,7 +151,7 @@ async function route(request,response,user){
               path: '/buckets/' + docID + "/" + fileName,
               method: 'DELETE',
               headers: {
-                "Authorization" : "Basic " + btoa(process.env.COUCHDB_USERNAME + ":" + process.env.COUCHDB_PASSWORD),
+                "Authorization" : "Basic " + btoa(process.env.COUCHDB_USER + ":" + process.env.COUCHDB_PASSWORD),
                 "If-Match" : rev
               },
             };
@@ -167,7 +169,7 @@ async function route(request,response,user){
         }
       })
       .catch((e) => {
-        console.log("error is " + e);
+        console.log("Mango error is " + e);
       })
     }
   } else {
@@ -177,6 +179,7 @@ async function route(request,response,user){
 }
 
 async function getBucketDoc(userID){
+  console.log("getBucketDoc function fired w user id: " + userID)
   let queryBody = {
     "selector": {
       "owner": {"$eq": userID}
@@ -184,7 +187,7 @@ async function getBucketDoc(userID){
   }
   let response = undefined;
   await db.http.post('/buckets/_find',JSON.stringify(queryBody)).then(async function (res) {
-
+    console.log(JSON.stringify(res.body))
     if(res.body.docs.length > 0){                        // bucket found
       response =  res.body.docs[0];
     } else {                                             // bucket not found create bucket
@@ -192,10 +195,14 @@ async function getBucketDoc(userID){
       let body = {};
       body.owner = userID;
       body["_id"] = newID;
+      console.log("calling buckets/"+newID+" with body " + JSON.stringify(body))
       await db.http.put('/buckets/' + newID, JSON.stringify(body)).then(async function(res){
         body["_rev"] = res.body.rev;
         response = body;
-      });
+      }).catch((e) => {
+        console.log("PUTBucketDoc error is " + e);
+        return
+      })
     }
   }).catch((e) => {
     console.log("getBucketDoc error is " + e);

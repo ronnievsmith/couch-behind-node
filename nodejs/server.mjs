@@ -1,6 +1,11 @@
 /*
   Ronnie Royston (https://ronnieroyston.com)
 */
+import { networkInterfaces } from "os";
+
+//var networkInterfaces = os.networkInterfaces();
+
+console.log(networkInterfaces);
 
 import fs from "node:fs";
 import http from "node:http";
@@ -85,6 +90,8 @@ const SERVER = http.createServer(async function(request, response) {
 
 
 (async function () {
+
+
     try {
       
       ROOT_PATH_DIRECTORIES.forEach(function(directory){ //  identify all hosted directories add append index.html

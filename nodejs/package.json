@@ -1,10 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "start": "nodemon --legacy-watch server.mjs"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
+    "start": "node server.mjs"
   },
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",

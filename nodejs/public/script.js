@@ -175,7 +175,7 @@ var cbn = (function() {
     });
   }
 
-  (() => {
+  //(() => {
     if(document.querySelector("#http-method")){
       if(localStorage.getItem("method")){
         document.querySelector("#http-method").value = localStorage.getItem("method");
@@ -225,7 +225,7 @@ var cbn = (function() {
         addBlurToBodyInput()
       }
     }
-  })();
+  //})();
 
   if (document.querySelector("#add-file")) { // if we are on app page read bucket
     let input = document.querySelector("#add-file");
