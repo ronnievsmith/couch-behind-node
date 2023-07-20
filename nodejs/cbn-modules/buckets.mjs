@@ -5,10 +5,12 @@ const {randomUUID} = await import('node:crypto');
 import 'dotenv/config';
 
 async function route(request,response,user){
-  if(user.id){
+  console.log("buckets route function hit w user ID " + user.sub)
+  if(user.sub){
     if (request.method === 'POST') {
+      console.log("buckets route hit " + request.headers)
       if (request.headers["content-type"].includes("multipart/form-data")){ // =============this is a file upload
-        let bucketDoc = await getBucketDoc(user.id); // ======================= Need to get revision of existing doc
+        let bucketDoc = await getBucketDoc(user.sub); // ======================= Need to get revision of existing doc
         const bb = busboy({ headers: request.headers });
         bb.on('file', (name, file, info) => { //=================================================================
           const { filename, encoding, mimeType } = info;
@@ -54,14 +56,14 @@ async function route(request,response,user){
               console.log("read POST hit")
               let queryBody = {
                 "selector": {
-                  "owner": {"$eq": user.id}
+                  "owner": {"$eq": user.sub}
                 }         
               }
               await db.http.post('/buckets/_find',JSON.stringify(queryBody))
               .then(async function (res) {
                 if(res.body.docs.length > 0){ // =====================================================bucket found
                   console.log("bucket found");
-                  if(res.body.docs[0].owner === user.id){ // ============================================= authorized
+                  if(res.body.docs[0].owner === user.sub){ // ============================================= authorized
                     response.writeHead(200, { 'Content-Type': 'text/plain' });
                     response.end(JSON.stringify(res.body.docs[0]));
                   } else { // ===================================================================== not authorized
@@ -102,7 +104,7 @@ async function route(request,response,user){
       .then(async function (res) {
         if(res.body.docs.length > 0){                        // bucket found
 
-          if(res.body.docs[0].owner === user.id){ // ============================= authorized
+          if(res.body.docs[0].owner === user.sub){ // ============================= authorized
             const opts = {
               host: process.env.COUCHDB_HOSTNAME,
               port: 5984,
@@ -144,7 +146,7 @@ async function route(request,response,user){
       .then(async function (res) {
         if(res.body.docs.length > 0){                        // bucket found
 
-          if(res.body.docs[0].owner === user.id){ // ============================= authorized
+          if(res.body.docs[0].owner === user.sub){ // ============================= authorized
             const opts = {
               host: process.env.COUCHDB_HOSTNAME,
               port: 5984,

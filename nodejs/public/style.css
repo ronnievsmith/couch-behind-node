@@ -219,6 +219,11 @@ summary:hover {
   cursor: pointer;
 }
 
+#create-admin-button {
+  background-color: #3e2723;
+  border-color: #3e2723;
+}
+
 #headers label {
   margin-left: 12px;
 }
@@ -330,9 +335,11 @@ summary:hover {
 .floated {
   float: left;
   width: 356px;
-  margin: 24px;
+  margin: 0px 24px 24px 0px;
 }
-
+.small {
+  font-size: 0.5em
+}
 .toast {
   position: fixed;
   left: 0;

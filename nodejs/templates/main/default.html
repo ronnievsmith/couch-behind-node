@@ -1,9 +1,12 @@
 <main>
 	<h1>
-		Couch Behind Node (CBN)
+		Couch Outfitted w/ Node
 	</h1>
+	<div class="floated">
+		<img src="./media/topology.png" alt="Topology Diagram" width="356">
+	</div>
 	<p>
-		Explore the features and interface of the <i>cluster of unreliable commodity hardware</i> (Couch) database with this basic implementation designed to operate as a foundation for building feature rich web applications. Node.js is configured as a front end web server and adds user authentication and authorization to the database system. NGINX is configured as an SSL offload reverse proxy. The three servers are containerized and easily launched via a single command line argument via Docker Compose.
+		Explore the features and interface of the <i>cluster of unreliable commodity hardware</i> (Couch) database as a foundation for web applications and services in concert with Node.js and NGINX. The three servers are containerized and easily launched via a single command line argument <code>docker compose up</code>.
 	</p>
 	<p>
 		There are two pages in addition to this homepage, namely the <i>app</i> page and the <i>fetch</i> page. The app page illustrates server side authorization based on JSON Web Token payload. Easily familiarize yourself with CouchDB's RESTful (HTTP) API on the fetch page.
@@ -12,11 +15,12 @@
 	<p>
 		<ul>
 			<li>JSON Web Token (RFC 7519) Based Authentication via Email Link</li>
-			<li>Role Based Authorization</li>
+			<li>Role Based Authorization via CouchDB's JWT Handler</li>
 			<li>CouchDB REST API Playground Graphical User Interface</li>
 			<li>Example Web Application Page Illustrates Concepts</li>
 			<li>Easy To Follow Server and Client Code</li>
 			<li>Portable & Cloud Ready Containerized Node.js, CouchDB, and NGINX</li>
+			<li>Single Command Launches All 3 Servers</li>
 			<li>Library Free HTML, CSS, JavaScript Using Native Node.js Modules Only *</li>
 		</ul>
 		<small>* The <a href="https://github.com/mscdex/busboy" target="_blank">Busboy</a> library is used for parsing <code>multipart/form</code> bodies. <a href="https://sendgrid.com/" target="_blank">Sendgrid</a> (free tier) is used for sending emails.</small>
@@ -37,9 +41,6 @@
 	<p>
 		Open up a terminal at the directory containing the <code>compose.yaml</code> file and issue the command <code>docker compose --env-file dev.env up --detach</code> to build and run the system of servers in development mode. For more information see <code>https://docs.docker.com/engine/reference/commandline/compose_up/</code>. Couchdb ships with an administrator graphical user interface available at <code>http://&#60;your-domain&#62;:5984/_utils</code> and the CBN homepage is available at <code>https://&#60;your-domain&#62;</code>, or <code>http://&#60;localhost&#62;</code>.
 	</p>
-	<div class="floated">
-		<img src="./media/topology.png" alt="Topology Diagram" width="356">
-	</div>
 	<h2>Basic System Architecture</h2>
 	<p>
 		All client requests except those coming from the fetch page are handled by the Node.js server. Node reads the HTTP cookies determining which requests are authorized to return data from CouchDB.

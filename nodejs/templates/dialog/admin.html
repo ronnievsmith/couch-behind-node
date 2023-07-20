@@ -1,0 +1,56 @@
+<dialog>
+  <section id="authenticate" hidden>
+    <h3>Authenticate</h3>
+    <fieldset>
+      <legend>Your Account</legend>
+      <div>
+        <label for="email">Email: </label> 
+        <input type="email" name="email" id="email" placeholder="Email" minlength="3" maxlength="320" required>
+      </div>
+    </fieldset>
+    <aside>
+      <p>
+        An email will be sent to you upon submission of this form. Click the link in the email to complete your registration.
+      </p>
+    </aside>
+    <span class="right">
+      <button class="button close-dialog-button">Close</button>
+      <button id="auth-create-button" class="button">Submit</button>
+    </span>
+  </section>
+  <section id="add-admin" hidden>
+    <h3>Create DataBase Administrator</h3>
+    <fieldset>
+      <legend>Administrator Email</legend>
+      <div>
+        <label for="admin-email">Email: </label> 
+        <input type="email" name="admin-email" id="admin-email" placeholder="Email" minlength="3" maxlength="320" required>
+      </div>
+      <div>
+        <label for="system-admin-checkbox">System Administrator</label> 
+        <input type="checkbox" name="system-admin-checkbox" id="system-admin-checkbox">
+      </div>
+    </fieldset>
+    <aside>
+      <p>
+        The email address obtains elevated access upon authenticating via the normal sign in flow. If the user is already signed in they must sign out and sign back in to obtain new privileges.
+      </p>
+    </aside>
+    <span class="right">
+      <button class="button close-dialog-button">Close</button>
+      <button id="add-admin-button" class="button">Submit</button>
+    </span>
+  </section>
+  <section id="log-out" hidden>
+    <h3>Log Out</h3>
+    <aside>
+      <p>
+        Click the button below to log out of your account.
+      </p>
+    </aside>
+    <span class="right">
+      <button class="close-dialog-button button">Close</button>
+      <button id="auth-delete-button" class="button">Log Out</button>
+    </span>
+  </section>
+</dialog>

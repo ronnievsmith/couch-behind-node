@@ -1,20 +1,23 @@
 const {createSign,createVerify} = await import('node:crypto');
 import { Buffer } from 'node:buffer';
 const headerObject = {
-  alg: 'HS256',
+  alg: 'RS256',
   typ: 'JWT',
+  kid: 'public'
 };
 const headerString = JSON.stringify(headerObject);
 const encodedHeader = Buffer.from(headerString).toString('base64url');
 
-function issue(privateKey,id,roles){
+function issue(privateKey,sub,roles,email){
+//function issue(privateKey,sub){
   let oneMonth = 2629800000;
   let exp = Date.now() + oneMonth;
   let payloadObject = {
-    "iss": 'my_server_name',//information about the server that issued the token
-    "exp": exp,
-    "roles": roles,
-    "id": id //put other stuff in here too to suit your needs
+    "exp":exp,
+    "iss":"nodejs",
+    "roles":roles,
+    "sub":sub,
+    "email":email
   };
   let payloadString = JSON.stringify(payloadObject);
   let encodedPayload = Buffer.from(payloadString).toString('base64url');
@@ -31,17 +34,25 @@ function verify(publicKey,jwt){
   let jwtHeader = jwtParts[0];
   let jwtPayload = jwtParts[1];
   let jwtSignature = jwtParts[2];
-  const verify = createVerify('SHA256');
-  verify.write(jwtHeader + '.' + jwtPayload);
-  verify.end();
   let obj = {};
-  obj.valid = verify.verify(publicKey, jwtSignature, 'base64url');
-  obj.payload = {};
   try {
-    jwtPayload = JSON.parse(Buffer.from(jwtPayload, 'base64url').toString('utf-8'));
-    obj.payload.id = jwtPayload.id;
-    obj.payload.roles = jwtPayload.roles;
+    let header = JSON.parse(Buffer.from(jwtHeader, 'base64url').toString('utf-8'));
+    let alg = header.alg;
+    if(alg === "RS256"){ // MUST verify alg is not set to none
+      const verify = createVerify('SHA256');
+      verify.write(jwtHeader + '.' + jwtPayload);
+      verify.end();
+      obj.valid = verify.verify(publicKey, jwtSignature, 'base64url');
+      obj.payload = {};
+      try {
+        jwtPayload = JSON.parse(Buffer.from(jwtPayload, 'base64url').toString('utf-8'));
+        obj.payload = Object.assign(obj.payload,jwtPayload);
+      } finally {
+        return obj;
+      }
+    }
   } finally {
+    obj.valid = false;
     return obj;
   }
 }

@@ -1,4 +1,5 @@
 var cbn = (function() {
+  const cookies = getCookies();
   let pub = {};
   let thisURL = new URL(window.location.href);
   readAuth()
@@ -8,6 +9,89 @@ var cbn = (function() {
   let responseBodyOutput = document.querySelector("#response-body > pre > code");
   let responseHeaders = document.querySelector("#response-headers > pre > code");
   let responseHeading = document.querySelector("#response-heading");
+
+  function composeURL(){
+    let scheme = document.querySelector("#scheme").value;
+    let service = document.querySelector("#service-add").value || document.querySelector("#service-add").placeholder;
+    let dbName = document.querySelector("#db-name").value;
+    let docName = document.querySelector("#doc-name").value;
+    let path = document.querySelector("#path").value;
+    let portNumber = document.querySelector("#port-number").value || document.querySelector("#port-number").placeholder;
+    console.log("processAddressing fired")
+    let composedURL = scheme+"://"+service+":"+portNumber
+    //if(!document.querySelector("#url").value){
+      document.querySelector("#url").placeholder = composedURL;
+    //}
+  }
+
+  function couchLinkClick(e){ //we need to build the url and place it in the url input
+    let path = e.target.textContent;
+    let baseURL = "";
+    let scheme = document.querySelector("#scheme").value;
+    let service = document.querySelector("#service-add").value || document.querySelector("#service-add").placeholder;
+    let portNumber = document.querySelector("#port-number").value || document.querySelector("#port-number").placeholder;
+    // if(document.querySelector("#port-number").value){
+      baseURL = scheme+"://"+service+":"+portNumber;
+    // } else {
+    //   baseURL = scheme+"://"+service;
+    // }
+    let dbName = document.querySelector("#db-name").value || document.querySelector("#db-name").placeholder;
+    if(path.includes("{db}")){
+      path = path.replace("{db}",dbName)
+    }
+    let docName = document.querySelector("#doc-name").value || document.querySelector("#doc-name").placeholder;
+    if(path.includes("{doc}")){
+      path = path.replace("{doc}",docName)
+    }
+    let nodeName = document.querySelector("#node-name").value || document.querySelector("#node-name").placeholder;
+    if(path.includes("{node-name}")){
+      path = path.replace("{node-name}",nodeName)
+    }
+    let newUrl = baseURL + path;
+    document.querySelector("#url").value = newUrl;
+    document.querySelector("#path").textContent = path;
+  }
+
+if(document.querySelectorAll("#addressing input")){
+  document.querySelectorAll("#addressing input").forEach(function(input){
+    input.addEventListener("blur", function(e){
+      localStorage.setItem(e.target.id, e.target.value);
+    })
+  });
+}
+
+if(document.querySelector("#scheme")){
+  document.querySelector("#scheme").addEventListener("change",function(){
+    localStorage.setItem(e.target.id, e.target.value);
+  })
+}
+
+if(localStorage.getItem("service-add")){
+  if(document.querySelector("#service-add")){
+    document.querySelector("#service-add").value = localStorage.getItem("service-add");
+  }
+}
+if(localStorage.getItem("db-name")){
+  if(document.querySelector("#db-name")){
+    document.querySelector("#db-name").value = localStorage.getItem("db-name");
+  }
+}
+if(localStorage.getItem("doc-name")){
+  if(document.querySelector("#doc-name")){
+    document.querySelector("#doc-name").value = localStorage.getItem("doc-name");
+  }
+}
+if(localStorage.getItem("path")){
+  if(document.querySelector("#path")){
+    document.querySelector("#path").value = localStorage.getItem("path");
+  }
+}
+if(localStorage.getItem("port-number")){
+  if(document.querySelector("#port-number")){
+    document.querySelector("#port-number").value = localStorage.getItem("port-number");
+  }
+}
+
 
   class DeleteSVG {
     constructor() {
@@ -101,9 +185,31 @@ var cbn = (function() {
     }
   }
 
-  if(localStorage.getItem("url")){
-    if(document.querySelector("#url")){
+  function returnAuthHeader () {
+    let header = {};
+    if(cookies.token){
+      header["Authorization"] = "Bearer " + cookies.token;
+    }
+    if(document.querySelector("#basic-auth-cbx")){
+      if(document.querySelector("#basic-auth-cbx").checked){
+        let username = document.querySelector("#username").value;
+        let password = document.querySelector("#password").value;
+        header["Authorization"] = "Basic " + btoa(username + ":" + password);
+      }
+    } 
+
+    return header;
+  }
+  if(document.querySelector("#url")){
+    if(localStorage.getItem("url")){
       document.querySelector("#url").value = localStorage.getItem("url");
+    } else {
+      let baseURL = "";
+      let scheme = document.querySelector("#scheme").value;
+      let service = document.querySelector("#service-add").value || document.querySelector("#service-add").placeholder;
+      let portNumber = document.querySelector("#port-number").value || document.querySelector("#port-number").placeholder;
+      baseURL = scheme+"://"+service+":"+portNumber;    
+      document.querySelector("#url").value = baseURL;  
     }
   }
 
@@ -235,11 +341,15 @@ var cbn = (function() {
         //console.log(input.files[index].name, " ", input.files[index].size, " ", input.files[index].type)
         formData.append("file", input.files[index]);
       });
-      let writeBucketResponse = await fetch(thisURL.origin + "/buckets", {
+      // let writeBucketResponse = await fetch(thisURL.origin + "/buckets", {
+      //   method: "POST",
+      //   body: formData
+      // });
+      // writeBucketResponse = await writeBucketResponse.json();
+      let writeBucketResponse = await call(thisURL.origin + "/buckets", {
         method: "POST",
         body: formData
       });
-      writeBucketResponse = await writeBucketResponse.json();
       if(writeBucketResponse["rev"]){
         document.querySelector("#bucket-output").dataset.rev = writeBucketResponse["rev"];
         document.querySelector("#bucket-output").dataset.id = writeBucketResponse["id"];
@@ -259,13 +369,75 @@ var cbn = (function() {
     })
   }
 
+  if(document.querySelector("#create-admin-button")){
+    document.querySelector("#create-admin-button").addEventListener("click", function(e) {
+      document.querySelector("#add-admin").removeAttribute("hidden", "");
+      showDialog();
+    });
+  }
+
+  if (document.querySelector("#add-admin-button")){
+    document.querySelector("#add-admin-button").addEventListener("click", async function(e) {
+      if (document.querySelector("#admin-email").checkValidity()) {
+        // user will be given server admin privileges
+        if(document.querySelector("#system-admin-checkbox").checked){ //  user already in the users db and if so what is their id?
+          let username = document.querySelector("#username").value;
+          let password = document.querySelector("#password").value;
+          let initOptions={};
+          let headers={}
+          headers = Object.assign(headers,returnAuthHeader ());
+          headers["Content-Type"] = "application/json";
+          initOptions['headers']=headers;
+          let newAdminReqBody = {};
+          let body = {};
+          body.action = "read";
+          body.email = document.querySelector("#admin-email").value;
+
+          initOptions['body']=JSON.stringify(body);
+          initOptions['method']="POST";
+          let res = await fetch(thisURL.origin + "/authentication", initOptions);
+          res = await res.json();
+          console.log(JSON.stringify(res))
+          if (res.docs.length > 0) {                      //                      user record found 
+            newAdminReqBody.id = res.docs[0]["_id"];
+          } else { //                                                             user not in users db so create them
+            // first we need to add them to the users database
+            body = {};
+            body.action = "create";
+            body.email = document.querySelector("#admin-email").value;
+            initOptions['body']=JSON.stringify(body);
+            let createUserRes = await fetch(thisURL.origin + "/authentication", initOptions);
+            //console.log(JSON.stringify(createUserRes))
+            createUserRes = await createUserRes.json()
+            //console.log(createUserRes)
+            if(createUserRes.ok){ 
+              newAdminReqBody.id = createUserRes.id; //                            now add them to the admin db
+            }
+          }
+          initOptions['method']="PUT";
+          initOptions['body']=`"${self.crypto.randomUUID()}"`;
+          let newAdminRes = await fetch(thisURL.origin + ":5984/_node/_local/_config/admins/" + newAdminReqBody.id, initOptions);
+          if(newAdminRes.ok){ // user has been added to administrators database
+            closeDialog();
+            toast("Admin Added");
+          } else { //failure adding user to administrator database
+            closeDialog();
+            toast("Error " + newAdminRes.statusText);
+          }
+        }
+      } else {
+        document.querySelector("#admin-email").reportValidity()
+      }
+    })
+  }
+
   if (document.querySelector("#auth-create-button")){
     document.querySelector("#auth-create-button").addEventListener("click", async function(e) {
       if (document.querySelector("#email").checkValidity()) {
         let body = {};
         body.action = "create";
         body.email = document.querySelector("#email").value;
-        await fetch(thisURL.origin + "/auth", {
+        await fetch(thisURL.origin + "/authentication", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -284,7 +456,7 @@ var cbn = (function() {
     document.querySelector("#auth-delete-button").addEventListener("click", async function(e) {
       let body = {};
       body.action = "delete";
-      await fetch(thisURL.origin + "/auth", {
+      await fetch(thisURL.origin + "/authentication", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -429,15 +601,35 @@ var cbn = (function() {
     })
   }
 
-  async function call(add, options) {
-    jsonData = null;
-    try {
-      let response = await fetch(add, options);
-      jsonData = await response.json();
-    } finally {
-      return jsonData;
+  // async function call(add, options) {
+  //   jsonData = null;
+  //   try {
+  //     let response = await fetch(add, options);
+  //     jsonData = await response.json();
+  //   } catch {
+  //     return jsonData;
+  //   }
+  // }
+
+async function call(add, options) {
+  let res = undefined;
+  try {
+    const response = await fetch(add, options);
+    if (!response.ok) {
+      throw new Error("Network response was not OK");
     }
+    try{
+      res = await response.json();
+    } catch {
+      res = await response.text();
+    }
+  } catch (error) {
+    res = error;
+  } finally {
+    return res;
   }
+}
+
 
   function closeDialog() {
     document.querySelectorAll("dialog > section").forEach(function(section) {
@@ -447,19 +639,10 @@ var cbn = (function() {
     document.querySelector("dialog").close();
   }
 
-  function couchLinkClick(e){
-    let path = e.target.textContent;
-    let address = document.querySelector("#url").value || "http://localhost";
-    let url = new URL(address);
-    let base = url.href.replace(url.pathname,"");
-    let newUrl = base + path;
-    document.querySelector("#url").value = newUrl;
-    document.querySelector("#path").textContent = path;
-  }
-
   async function fetchFunction(e){
     let method = e.target.textContent || "GET";
-    let add = document.querySelector("#url").value.toLowerCase();
+    let add = document.querySelector("#url").value;
+    //localStorage.setItem("path",document.querySelector("#path").textContent);
     document.querySelector("#method").innerHTML=method;
     let username = document.querySelector("#username").value;
     let password = document.querySelector("#password").value;
@@ -476,11 +659,7 @@ var cbn = (function() {
         }     
       }
     })
-    if(document.querySelector("#basic-auth-cbx")){
-      if(document.querySelector("#basic-auth-cbx").checked){
-        headers["Authorization"] = "Basic " + btoa(username + ":" + password);
-      }
-    }
+    headers = Object.assign(headers,returnAuthHeader ());
     if(document.querySelector("#include-body-cbx")){
       if(document.querySelector("#include-body-cbx").checked){
         initOptions["body"] = document.querySelector("#message-body").value;
@@ -495,7 +674,9 @@ var cbn = (function() {
     }
     initOptions['method']=method;
     initOptions['headers']=headers;
+
     try {
+      console.log(add,initOptions)
       let response = await fetch(add,initOptions);
       response.headers.forEach(function(k,v){
         let t = document.createTextNode(v.trim() + ": " + k.trim());
@@ -507,9 +688,21 @@ var cbn = (function() {
       if(response.ok){
         responseOK = "OK";
       }
-      let responseHeadingText = document.createTextNode(protocol + " " + response.status + " " + responseOK)
-      responseHeading.appendChild(responseHeadingText);
-      // let res = await response;
+      responseHeading.appendChild(document.createTextNode(protocol + " "));
+
+      let span = document.createElement("span");
+      span.appendChild(document.createTextNode(response.status + " " + responseOK))
+      let firstDigit = response.status.toString().split("")[0];
+      if(firstDigit == 2){
+        span.style.color = "#1b5e20";
+      }
+      if(firstDigit == 4){
+        span.style.color = "#d50000";
+      }
+      if(firstDigit == 5){
+        span.style.color = "#b71c1c";
+      }      
+      responseHeading.appendChild(span);
       try {
         let jsonData = await response.json();
         jsonData = JSON.stringify(jsonData, null, 2)
@@ -551,32 +744,26 @@ var cbn = (function() {
   }
 
   async function readAuth() {
-    let body = {};
-    body.action = "read";
-    let cookies = getCookies();
-    if (cookies.authentication) {
-      try {
-        pub.user = await call(thisURL.origin + "/auth", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(body)
-        });
-      } finally {
-        if (pub.user) {
-          if (!pub.user.email) {
-            delete pub.user;
-          }
-        } else {
-          delete pub.user;
-        }
-      }
-    } else {
-      delete pub.user;
+    try {
+      pub.user = parseJwt(cookies.token)
+    } finally {
+      afterAuth();
     }
-    afterAuth();
   }
+
+function parseJwt (token) {
+  try {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+
+}
 
   async function readBuckets() {
     let body = {};

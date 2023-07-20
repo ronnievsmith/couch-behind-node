@@ -1,21 +1,51 @@
 <main>
-  <h1>Couch DB REST API</h1>
-  <p>
-  	This page should not exist in a production application but is here for familiarizing users with the CouchDB HTTP API. In a live app all client HTTP requests should route through the NodeJS server - <i>Couch Behind Node</i>. The CouchDB server listens on port 5984, or <code>http://localhost:5984</code>.
-  </p>
-	<details class="bg-gray" open>
-	<br>
-	<summary>
+  <h1>CouchDB REST. RELAX.</h1>
+  <h2>
 		<span id="method">GET</span>
 		<span id="path"></span>
-		<span>HTTP/1.1</span>
-	</summary>
+		<span>HTTP/1.1</span>  	
+  </h2>
+	<span>
+		<button id="create-admin-button" class="button">CREATE SERVER ADMIN</button>
+	</span>
+	<span style="float:right">
+		<button class="fetch bg-red">DELETE</button>
+		<button class="fetch bg-green">GET</button>
+		<button class="fetch bg-yellow">HEAD</button>
+		<button class="fetch bg-orange">POST</button>
+		<button class="fetch bg-purple">PUT</button>
+	</span>
+	<br><br>
 	<fieldset id="authority">
-		<legend>Authority</legend>
+		<legend>Target</legend>
 		<label for="url">URL:</label>
 		<input type="text" name="url" id="url" placeholder="https://dummyjson.com/products/1"></input>
 	</fieldset>
 	<br>
+	<details class="bg-gray" open>
+		<br>
+		<summary>
+			Address Settings
+		</summary>
+		<fieldset>
+			<legend>Base URL</legend>
+		  <select name="scheme" id="scheme">
+		    <option value="http" selected>http</option>
+		    <option value="https">https</option>
+		  </select>
+		  <span>://</span>
+		  <input id=service-add type=text placeholder="localhost">
+		  <span>:</span>
+		  <input id=port-number type=text placeholder="5984" style="width:56px">
+		</fieldset>
+		<br>
+		<fieldset>
+			<legend>Presets</legend>
+		  <input id=db-name type=text placeholder="my_db">
+		  <input id=doc-name type=text placeholder="my_doc">
+		  <input id=node-name type=text placeholder="_local">
+	  </fieldset>
+		<br>
 	</details>
 	<br>
 	<details class="bg-gray" open>
@@ -66,16 +96,6 @@
 			<textarea id="message-body" rows="5" cols="66"></textarea>
 		</fieldset>
 	</details>
-	<div id="full-url"></div>
-	<br>
-	<span style="float:right">
-		<button class="fetch bg-red">DELETE</button>
-		<button class="fetch bg-green">GET</button>
-		<button class="fetch bg-yellow">HEAD</button>
-		<button class="fetch bg-orange">POST</button>
-		<button class="fetch bg-purple">PUT</button>
-	</span>
-
 	</main>
 <script>
 

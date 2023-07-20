@@ -1,11 +1,9 @@
 /*
   Ronnie Royston (https://ronnieroyston.com)
 */
-import { networkInterfaces } from "os";
-
+//import { networkInterfaces } from "os";
 //var networkInterfaces = os.networkInterfaces();
-
-console.log(networkInterfaces);
+//console.log(networkInterfaces);
 
 import fs from "node:fs";
 import http from "node:http";
@@ -14,11 +12,17 @@ import url from 'node:url';
 import 'dotenv/config';
 const DIRECTORIES = [];
 const DIR_NAME = path.dirname(url.fileURLToPath(import.meta.url));
+
+// const PRIVATE_KEY_PATH = path.join(DIR_NAME, 'private.pem');
+// const PUBLIC_KEY_PATH = path.join(DIR_NAME, 'public.pem');
+
 import { Doc } from './cbn-modules/doc.mjs';
 import MIME_TYPES from './cbn-modules/mime-types.mjs';
 import db from './cbn-modules/db.mjs';
 import jwt from './cbn-modules/jwt.mjs';
-import auth from './cbn-modules/auth.mjs';
+import authentication from './cbn-modules/authentication.mjs';
+import authorization from './cbn-modules/authorization.mjs';
+import couch from './cbn-modules/couch.mjs';
 import buckets from './cbn-modules/buckets.mjs';
 import sgMail from '@sendgrid/mail';
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "SG.my.key";
@@ -31,36 +35,29 @@ const HEADERS = {
 };
 const PORT = process.env.NODEJS_PORT || 8080;
 const ROOT_DIRECTORY = './public';
-const PRIVATE_KEY_FILENAME = './private.pem';
-const PUBLIC_KEY_FILENAME = './public.pem';
+// const PRIVATE_KEY_FILENAME = './private.pem';
+// const PUBLIC_KEY_FILENAME = './public.pem';
 const ROOT_PATH = path.join(DIR_NAME, ROOT_DIRECTORY);
 const ROOT_PATH_DIRECTORIES = getDirectoriesRecursive(ROOT_PATH);
 const ROOT_PATH_DEPTH = ROOT_PATH.split(path.sep).length;
-const { privateKey, publicKey } = auth.getKeys();  //before we start server we need RSA keys
+const { privateKey, publicKey } = authentication.getKeys();  //before we start server we need RSA keys
 
 const SERVER = http.createServer(async function(request, response) {
   let statusCode = 200;
-  let user = {};
-  user.id = null;
-  user.roles = [];
-  if(request.headers.cookie){
-    let cookies = parseCookies(request.headers.cookie);
-    if(cookies.token){
-      let token = cookies.token;
-      let jot = jwt.verify(publicKey,token);
-      user.id = jot.payload.id;
-      user.roles = jot.payload.roles;      
-    }
-  }
+  let user = await authorization.user(request);
   if(request.url === '/app') {
     let doc = await new Doc({'main':'app', 'aside':'app', 'bodyClass':'wide-nav'}).build(); // return app page
     response.end(doc);
   } else if (request.url.startsWith('/buckets')){
+    console.log("main /buckets clause hit")
     buckets.route(request,response,user)
-  } else if (request.url.startsWith('/auth')){
-    auth.route(request,response,user)
+  } else if (request.url.startsWith('/authentication')){
+    authentication.route(request,response,user)
+  } else if (request.url.startsWith('/couch')){
+    console.log("main /couch clause hit")
+    couch.route(request,response,user);
   } else if (request.url === '/fetch'){
-    let doc = await new Doc({'main':'fetch', 'aside':'fetch', 'nav':'couch', 'bodyClass':'wide-nav'}).build();
+    let doc = await new Doc({'main':'fetch', 'aside':'fetch', 'nav':'couch', 'dialog':'admin', 'bodyClass':'wide-nav'}).build();
     response.end(doc);
   } else {
     let file = await fileNameBuilder(request.url);
@@ -108,6 +105,8 @@ const SERVER = http.createServer(async function(request, response) {
       let _replicatorDbExists = await loadDatabase("_replicator"); //           DOES THE _REPLICATOR DATABASE EXIST?
       let usersDbExists = await loadDatabase("users");       //                 DOES THE USERS DATABASE EXIST?
       let bucketsDbExists = await loadDatabase("buckets");   //                 DOES THE BUCKETS DATABASE EXIST?
+
+      await authentication.sendPublicKey()
 
       if(SENDGRID_API_KEY === 'SG.my.key'){
         throw new Error('Sendgrid API key required to start server.');

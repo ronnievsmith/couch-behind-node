@@ -8,7 +8,7 @@ services:
     container_name: couchdb
     restart: unless-stopped
     ports:
-      - "${COUCHBD_PORT}:${COUCHBD_PORT}"
+      - "5984:5984"
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=admin
@@ -28,11 +28,11 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
   nodejs:
     build:
-      context: ./nodejs
+      context: .
       dockerfile_inline: |
         FROM node:slim
         WORKDIR /usr/src/app/
-        COPY ./ ./
+        COPY ./nodejs ./
         RUN npm install && npm cache clean --force
     container_name: nodejs
     restart: unless-stopped
@@ -40,3 +40,5 @@ services:
       sh -c "npm start"
     ports:
       - "8080:8080"
+    volumes:
+      - ./nodejs/keys:/usr/src/app/keys

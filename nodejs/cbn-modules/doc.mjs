@@ -19,7 +19,7 @@ class Doc {
     let mainFileName = this.options.main || 'default';
     let footerFileName = this.options.footer || 'default';
     let dialogFileName = this.options.dialog || 'default';
-    let toastFileName = this.options.dialog || 'default';
+    let toastFileName = this.options.toast || 'default';
     let bodyClass = this.options.bodyClass;
 
     let [headFile, headerFile, navFile, asideFile, mainFile, footerFile, dialogFile, toastFile] = await Promise.all([
