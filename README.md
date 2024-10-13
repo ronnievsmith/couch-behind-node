@@ -7,7 +7,7 @@
  - HTTP API playground familiarizes users with CouchDB
 
 ## Summary
-JSON Web Tokens minted from email link authentication delivers client side session management. Single "docker compose up" command launches open source nginx, nodejs, and couchdb servers configured with host folders bind mounted enabling live code updates (e.g. nodemon) without requiring container restarts/rebuilds.
+JSON Web Tokens minted from email link authentication delivers client side session management. Single "docker compose up" command launches open source nginx, nodejs, and couchdb servers configured with host folders bind mounted enabling live code updates (e.g. nodemon) without requiring container restarts/rebuild.
 
 Nginx is the front end reverse proxy cache engine. Nodejs' http module is minimally configured as a web server and crypto library issues and verifies JWT's. CouchDB is the document database.
 
